@@ -1,0 +1,99 @@
+services:
+  # nifi:
+  #   image: apache/nifi:latest
+  #   container_name: nifi
+  #   ports:
+  #     - "8080:8080"
+  #   environment:
+  #     - NIFI_WEB_HTTP_PORT=8080
+  #   volumes:
+  #     - nifi_data:/opt/nifi/nifi-current/logs
+  #     - nifi_conf:/opt/nifi/nifi-current/conf
+  #     - ~/nifi_drivers:/opt/nifi/nifi-current/lib/custom
+  #   networks:
+  #     - nifi_network
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    ports:
+      - "3254:5432"
+    environment:
+      POSTGRES_USER: master
+      POSTGRES_PASSWORD: L1u&p3ri
+      POSTGRES_DB: Liverpool
+    networks:
+      #- nifi_network
+      - pg_network
+    #ESTOY USANDO LOS VOLUMES PROPIOS DE DOCKER
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+  jupyter:
+    container_name: jupyter
+    user: root
+    image: gmoya110101/jupyter-spark:1.0
+    restart: always
+    volumes:
+      - ./notebooks:/home/jupyternb/gmoya #My notebooks
+      - ~/.jupyter:/home/jovyan/.jupyter #Configurations
+
+    environment:
+      - JUPYTER_TOKEN=my_token
+      - NB_USER=jupyternb
+      - NB_UID=1000
+      - NB_GID=100
+      - CHOWN_HOME=yes
+    working_dir: /home/jupyternb/gmoya
+    ports:
+      - '8888:8888'
+    networks:
+      - pg_network
+
+  # mssql:
+  #   container_name: mssql
+  #   hostname: mssql
+  #   image: mcr.microsoft.com/mssql/server:2022-latest
+  #   environment:
+  #     ACCEPT_EULA: 'Y'
+  #     MSSQL_SA_PASSWORD: 'kafka@123'
+  #     MSSQL_DATA_DIR: /var/opt/mssql/data
+  #     MSSQL_PID: 'Developer' 
+  #     MSSQL_TCP_PORT: 1433 
+  #   ports: 
+  #     - "1455:1433"
+  #   volumes:
+  #   #ESTOY USANDO BINDMOUNTS
+  #     - ./data:/var/opt/mssql/data
+  #     - ./log:/var/opt/mssql/log
+  #     - ./secrets:/var/opt/mssql/secrets
+  #   networks:
+  #     - nifi_network
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    restart: unless-stopped
+    environment:
+      - GF_LOG_LEVEL=error
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=k@fk@01
+    ports:
+      - '3000:3000'
+    volumes:
+      - 'grafana_storage:/var/lib/grafana'
+    networks:
+      - pg_network
+
+networks:
+  nifi_network:
+    driver: bridge
+  pg_network:
+    driver: bridge
+
+volumes:
+  #nifi_data:
+  #nifi_conf:
+  postgres_data:
+  grafana_storage:
+
+
