@@ -76,7 +76,7 @@ services:
     environment:
       - GF_LOG_LEVEL=error
       - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=k@fk@01
+      - GF_SECURITY_ADMIN_PASSWORD=p@sw0rd
     ports:
       - '3000:3000'
     volumes:
